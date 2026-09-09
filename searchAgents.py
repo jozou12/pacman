@@ -296,14 +296,17 @@ class CornersProblem(search.SearchProblem):
         space)
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        "corner(left_bottom, left_top, right_bottom, right_top)"
+        return (self.startingPosition,(False,False,False,False))
+  
 
     def isGoalState(self, state: Any):
         """
         Returns whether this search state is a goal state of the problem.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        return state[1] == (True, True, True, True)
+
 
     def getSuccessors(self, state: Any):
         """
@@ -326,7 +329,21 @@ class CornersProblem(search.SearchProblem):
             #   hitsWall = self.walls[nextx][nexty]
 
             "*** YOUR CODE HERE ***"
-
+            x,y = state[0]
+            dx, dy = Actions.directionToVector(action)
+            nextx, nexty = int(x + dx), int(y + dy)
+            "Check if the new position it's a wall, if it is, skip it"
+            if not self.walls[nextx][nexty]:
+                "Check if the new position it's one of the corner's position"
+                corners_visited = state[1]
+                for i in range(4):
+                    "tuple can't change in python, we have to convert to list first"
+                    if nextx == self.corners[i][0] and nexty == self.corners[i][1]:
+                        corners_visited = list(state[1])
+                        corners_visited[i] = True
+                        corners_visited = tuple(corners_visited)
+                new_state = ((nextx, nexty), corners_visited)
+                successors.append((new_state, action, 1))
         self._expanded += 1 # DO NOT CHANGE
         return successors
 
@@ -362,7 +379,29 @@ def cornersHeuristic(state: Any, problem: CornersProblem):
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
 
     "*** YOUR CODE HERE ***"
-    return 0 # Default to trivial solution
+    current_pos = state[0]
+    corners_status = list(state[1])
+    total_distance = 0
+
+    while True:
+        shortest_distance = float('inf')
+        nearest_corner = None
+        nearest_index = -1
+        for i in range(4):
+            if not corners_status[i]:
+                xy2 = corners[i]
+                distance = abs(current_pos[0] - xy2[0]) + abs(current_pos[1] - xy2[1])
+                if distance < shortest_distance:
+                    shortest_distance = distance
+                    nearest_corner = xy2
+                    nearest_index = i
+        if nearest_corner is None:
+            break
+        corners_status[nearest_index] = True
+        current_pos = nearest_corner
+        total_distance += shortest_distance
+        
+    return total_distance
 
 
 
@@ -428,29 +467,45 @@ class AStarFoodSearchAgent(SearchAgent):
         self.searchFunction = lambda prob: search.aStarSearch(prob, foodHeuristic)
         self.searchType = FoodSearchProblem
 
-def foodHeuristic(state: Tuple[Tuple, List[List]], problem: FoodSearchProblem):
-    """
-    Your heuristic for the FoodSearchProblem goes here.
+# def foodHeuristic(state: Tuple[Tuple, List[List]], problem: FoodSearchProblem):
+#     """
+#     Your heuristic for the FoodSearchProblem goes here.
 
-    If using A* ever finds a solution that is worse than what uniform cost search
-    finds, your search may have a bug or your heuristic is not admissible!  On the
-    other hand, inadmissible heuristics may find optimal solutions, so be careful.
+#     If using A* ever finds a solution that is worse than what uniform cost search
+#     finds, your search may have a bug or your heuristic is not admissible!  On the
+#     other hand, inadmissible heuristics may find optimal solutions, so be careful.
 
-    The state is a tuple ( pacmanPosition, foodGrid ) where foodGrid is a Grid
-    (see game.py) of either True or False. You can call foodGrid.asList() to get
-    a list of food coordinates instead.
+#     The state is a tuple ( pacmanPosition, foodGrid ) where foodGrid is a Grid
+#     (see game.py) of either True or False. You can call foodGrid.asList() to get
+#     a list of food coordinates instead.
 
-    If you want access to info like walls, capsules, etc., you can query the
-    problem.  For example, problem.walls gives you a Grid of where the walls
-    are.
+#     If you want access to info like walls, capsules, etc., you can query the
+#     problem.  For example, problem.walls gives you a Grid of where the walls
+#     are.
 
-    If you want to *store* information to be reused in other calls to the
-    heuristic, there is a dictionary called problem.heuristicInfo that you can
-    use. For example, if you only want to count the walls once and store that
-    value, try: problem.heuristicInfo['wallCount'] = problem.walls.count()
-    Subsequent calls to this heuristic can access
-    problem.heuristicInfo['wallCount']
-    """
+#     If you want to *store* information to be reused in other calls to the
+#     heuristic, there is a dictionary called problem.heuristicInfo that you can
+#     use. For example, if you only want to count the walls once and store that
+#     value, try: problem.heuristicInfo['wallCount'] = problem.walls.count()
+#     Subsequent calls to this heuristic can access
+#     problem.heuristicInfo['wallCount']
+#     """
+#     position, foodGrid = state
+#     "*** YOUR CODE HERE ***"
+#     return 0
+def foodHeuristic(state, problem):
+    position, foodGrid = state
+    foodList = foodGrid.asList()
+    
+    if not foodList:
+        return 0
+    
+    max_distance = 0
+    for food in foodList:
+        distance = mazeDistance(position, food, problem.startingGameState)
+        max_distance = max(max_distance, distance)
+    
+    return max_distance 
 
 # Originally, we used Manhattan distance from Pacman to the farthest food but the number of nodes expanded was still high (>9000)
 # Instead, we decided to find the two remaining food pellets that are farthest apart using Manhattan distance

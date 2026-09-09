@@ -451,10 +451,43 @@ def foodHeuristic(state: Tuple[Tuple, List[List]], problem: FoodSearchProblem):
     Subsequent calls to this heuristic can access
     problem.heuristicInfo['wallCount']
     """
-    position, foodGrid = state
-    "*** YOUR CODE HERE ***"
-    return 0
 
+# Originally, we used Manhattan distance from Pacman to the farthest food but the number of nodes expanded was still high (>9000)
+# Instead, we decided to find the two remaining food pellets that are farthest apart using Manhattan distance
+# Since Pacman eventually needs to eat both pellets, we first find which one is closer to Pacman and then the distance between the two
+# This is admissible because it estimates the minimum distance Pacman would need to travel to reach both foods (the lower bound so wouldn't be an overestimate)
+
+    position, foodGrid = state
+    food_list = foodGrid.asList() # converting foodGrid into a list 
+    length = len(food_list)
+
+    if length == 0: # if there is no more food then return 0
+        return 0
+
+    # making sure that there is at least 2 food pellets (if only one left then return Manhattan distance)
+    if length == 1:
+        return util.manhattanDistance(position, food_list[0])
+
+    max_distance = 0 # storing the max distance 
+    first_food = None # initalizing the first food 
+    second_food = None # initalizing the second food 
+
+    # going through the food list to find the Manhattan distance to each food
+    for i in range(length):
+        for j in range(i + 1, length): 
+            distance = util.manhattanDistance(food_list[i], food_list[j]) # doing the manhattan distance for each pair of foods in the list  
+
+            # updating the max_distance for the pair of food that is the furthest from each other 
+            if distance > max_distance:
+                max_distance = distance
+                first_food = food_list[i]
+                second_food = food_list[j]
+    
+    # calculating the manhattanDistance that it would need from the position to the food location 
+    food_one_distance = util.manhattanDistance(position, first_food) 
+    food_two_distance = util.manhattanDistance(position, second_food)
+
+    return max_distance + min(food_one_distance, food_two_distance) # first going to the closer food pellet and then going to the further one 
 
 def mazeDistance(point1: Tuple[int, int], point2: Tuple[int, int], gameState: pacman.GameState) -> int:
     """

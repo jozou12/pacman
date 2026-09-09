@@ -193,6 +193,7 @@ def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic) -> List[Directi
     start = problem.getStartState() # getting the start of the search 
     fringe = util.PriorityQueue() # initalizing priority queue 
     visited = set() # initializing a set to store all visited states 
+    is_consistent = True # creating a consistency check 
 
     # storing the state, path, and cost along with the heuristic
     fringe.push((start, [], 0), heuristic(start, problem))
@@ -210,6 +211,11 @@ def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic) -> List[Directi
             continue
         
         if problem.isGoalState(state): # if the problem reaches the goal state then return the path 
+            if is_consistent:
+                print("CONSISTENT")
+            else:
+                print("INCONSISTENT")
+
             return path
 
         visited.add(state) # add the state into the visited set 
@@ -219,6 +225,14 @@ def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic) -> List[Directi
             successor_state = successor[0]
             action = successor[1]
             step_cost = successor[2]
+
+            current_h = heuristic(state, problem)
+            successor_h = heuristic(successor_state, problem)
+
+            # checking if the heuristic is consistent 
+            if current_h > step_cost + successor_h:
+                is_consistent = False
+
             new_path = path + [action] # updating the new path 
             new_cost = cost + step_cost # calculating the new cost 
             priority = new_cost + heuristic(successor_state, problem) # calculating the priority 

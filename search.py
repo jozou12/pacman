@@ -90,16 +90,94 @@ def depthFirstSearch(problem: SearchProblem) -> List[Directions]:
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
     "*** YOUR CODE HERE ***"
+    "Init the fringe and closed set for dfs graph search. Using Stack, LIFO"
+    fringe = util.Stack()
+    "Set store the visited state. Using set because the time complexity finding element from set it's O(n) = 1"
+    closed = set()
+    "Push the start state into fringe, no actions at all"
+    fringe.push((problem.getStartState(), []))
+    "if fringe is empty and not return the actions, it means can't find the solution"
+    while not fringe.isEmpty():
+        elem = fringe.pop()
+        state = elem[0]
+        actions = elem[1]
+        "if state is already in the closed set, skip it"
+        if state not in closed:
+            closed.add(state)
+            "check if the goal state is true, then return actions"
+            if problem.isGoalState(state):
+                return actions
+            "For DFS, we don't need cost"
+            for successors in problem.getSuccessors(state):
+                successor_state = successors[0]
+                successor_action = successors[1]
+                "update the actions"
+                new_actions = actions + [successor_action]
+                fringe.push((successor_state, new_actions))
+    return []
     util.raiseNotDefined()
 
 def breadthFirstSearch(problem: SearchProblem) -> List[Directions]:
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
+    "Init the fringe and closed set for bfs graph search, using Queue FIFO"
+    fringe = util.Queue()
+    "Set store the visited state. Using set because the time complexity finding element from set it's O(n) = 1"
+    closed = set()
+    "Push the start state into fringe, no actions at all"
+    fringe.push((problem.getStartState(), []))
+    "if fringe is empty and not return the actions, it means can't find the solution"
+    while not fringe.isEmpty():
+        elem = fringe.pop()
+        state = elem[0]
+        actions = elem[1]
+        "if state is already in the closed set, skip it"
+        if state not in closed:
+            closed.add(state)
+            "check if the goal state is true, then return actions"
+            if problem.isGoalState(state):
+                return actions
+            "For BFS, we don't need cost"
+            for successors in problem.getSuccessors(state):
+                successor_state = successors[0]
+                successor_action = successors[1]
+                "update the actions"
+                new_actions = actions + [successor_action]
+                fringe.push((successor_state, new_actions))
+    return []
     util.raiseNotDefined()
 
 def uniformCostSearch(problem: SearchProblem) -> List[Directions]:
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
+    "Init the fringe and closed set for bfs graph search, using PriorityQueue lowerest cost first out"
+    fringe = util.PriorityQueue()
+    "Set store the visited state. Using set because the time complexity finding element from set it's O(n) = 1"
+    closed = set()
+    "Push the start state into fringe, no actions at all. And we also need to put the total cost as part of the input"
+    fringe.push((problem.getStartState(), [], 0), 0)
+    "if fringe is empty and not return the actions, it means can't find the solution"
+    while not fringe.isEmpty():
+        elem = fringe.pop()
+        state = elem[0]
+        actions = elem[1]
+        costs = elem[2]
+        "if state is already in the closed set, skip it"
+        if state not in closed:
+            closed.add(state)
+            "check if the goal state is true, then return actions"
+            if problem.isGoalState(state):
+                return actions
+            "For UCS, we need cost in order to maintain the PriorityQueue"
+            for successors in problem.getSuccessors(state):
+                successor_state = successors[0]
+                successor_action = successors[1]
+                successor_cost = successors[2]
+                "update total actions and total cost"
+                new_actions = actions + [successor_action]
+                new_cost = costs + successor_cost
+                fringe.push((successor_state, new_actions, new_cost), new_cost)
+    return []
     util.raiseNotDefined()
 
 def nullHeuristic(state, problem=None) -> float:
@@ -112,6 +190,7 @@ def nullHeuristic(state, problem=None) -> float:
 def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic) -> List[Directions]:
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
+    
     util.raiseNotDefined()
 
 # Abbreviations

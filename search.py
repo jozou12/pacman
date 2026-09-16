@@ -89,96 +89,98 @@ def depthFirstSearch(problem: SearchProblem) -> List[Directions]:
     print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
-    "*** YOUR CODE HERE ***"
-    "Init the fringe and closed set for dfs graph search. Using Stack, LIFO"
-    fringe = util.Stack()
-    "Set store the visited state. Using set because the time complexity finding element from set it's O(n) = 1"
-    closed = set()
-    "Push the start state into fringe, no actions at all"
-    fringe.push((problem.getStartState(), []))
-    "if fringe is empty and not return the actions, it means can't find the solution"
+
+    fringe = util.Stack() # using a stack for DFS since we want to explore the most recent state first (LIFO)
+    closed = set() # keeping track of states we already visited so we don't explore them again
+
+    fringe.push((problem.getStartState(), [])) # start with the starting state and no actions taken yet
+
+    # keep searching until there is nothing left in the stack
     while not fringe.isEmpty():
+        # getting the next state we want to explore
         elem = fringe.pop()
         state = elem[0]
         actions = elem[1]
-        "if state is already in the closed set, skip it"
+
+        # only explore this state if we haven't visited it before
         if state not in closed:
             closed.add(state)
-            "check if the goal state is true, then return actions"
-            if problem.isGoalState(state):
+
+            if problem.isGoalState(state): # if we reached the goal, return the path we took to get here
                 return actions
-            "For DFS, we don't need cost"
+            
+            # looking through all the possible states we can go to next
             for successors in problem.getSuccessors(state):
                 successor_state = successors[0]
                 successor_action = successors[1]
-                "update the actions"
-                new_actions = actions + [successor_action]
-                fringe.push((successor_state, new_actions))
-    return []
-    util.raiseNotDefined()
+                new_actions = actions + [successor_action] # adding this move to the actions we have taken so far
+                fringe.push((successor_state, new_actions)) # adding the new state to the stack so we can explore it
+    return [] # if we searched everything and couldn't find the goal
 
 def breadthFirstSearch(problem: SearchProblem) -> List[Directions]:
     """Search the shallowest nodes in the search tree first."""
-    "*** YOUR CODE HERE ***"
-    "Init the fringe and closed set for bfs graph search, using Queue FIFO"
-    fringe = util.Queue()
-    "Set store the visited state. Using set because the time complexity finding element from set it's O(n) = 1"
-    closed = set()
-    "Push the start state into fringe, no actions at all"
-    fringe.push((problem.getStartState(), []))
-    "if fringe is empty and not return the actions, it means can't find the solution"
+
+    fringe = util.Queue() # using a queue for BFS since we want to explore the oldest state first (FIFO)
+    closed = set() # keeping track of states we already visited so we don't explore them again
+    fringe.push((problem.getStartState(), [])) # start with the starting state and no actions taken yet
+
+    # keep searching until there is nothing left in the queue
     while not fringe.isEmpty():
+        # get the next state we want to explore
         elem = fringe.pop()
         state = elem[0]
         actions = elem[1]
-        "if state is already in the closed set, skip it"
+
+        # only explore this state if we haven't visited it before
         if state not in closed:
             closed.add(state)
-            "check if the goal state is true, then return actions"
+
+            # if we reached the goal, return the path we took to get here
             if problem.isGoalState(state):
                 return actions
-            "For BFS, we don't need cost"
+
+            # look through all the possible states we can go to next
             for successors in problem.getSuccessors(state):
                 successor_state = successors[0]
                 successor_action = successors[1]
-                "update the actions"
-                new_actions = actions + [successor_action]
-                fringe.push((successor_state, new_actions))
-    return []
-    util.raiseNotDefined()
+                new_actions = actions + [successor_action] # adding this move to the actions we have taken so far
+                fringe.push((successor_state, new_actions)) # adding the new state to the queue so we can explore it later
+    return [] # if we searched everything and couldn't find the goal
 
 def uniformCostSearch(problem: SearchProblem) -> List[Directions]:
     """Search the node of least total cost first."""
-    "*** YOUR CODE HERE ***"
-    "Init the fringe and closed set for bfs graph search, using PriorityQueue lowerest cost first out"
-    fringe = util.PriorityQueue()
-    "Set store the visited state. Using set because the time complexity finding element from set it's O(n) = 1"
-    closed = set()
-    "Push the start state into fringe, no actions at all. And we also need to put the total cost as part of the input"
-    fringe.push((problem.getStartState(), [], 0), 0)
-    "if fringe is empty and not return the actions, it means can't find the solution"
+
+    fringe = util.PriorityQueue() # using a priority queue for UCS so the path with the lowest cost comes out first
+    closed = set() # keeping track of states we already visited so we don't explore them again
+    fringe.push((problem.getStartState(), [], 0), 0) # starting with the starting state; no actions taken yet and a cost of 0
+
+    # keep searching until there is nothing left in the priority queue
     while not fringe.isEmpty():
+        # getting the path with the lowest total cost
         elem = fringe.pop()
         state = elem[0]
         actions = elem[1]
         costs = elem[2]
-        "if state is already in the closed set, skip it"
+
+        # only explore this state if we haven't visited it before
         if state not in closed:
             closed.add(state)
-            "check if the goal state is true, then return actions"
+
+            # if we reached the goal return the path we took to get here
             if problem.isGoalState(state):
                 return actions
-            "For UCS, we need cost in order to maintain the PriorityQueue"
+
+            # looking through all the possible states we can go to next
             for successors in problem.getSuccessors(state):
                 successor_state = successors[0]
                 successor_action = successors[1]
                 successor_cost = successors[2]
-                "update total actions and total cost"
+
+                # updating the actions and total cost for this new path
                 new_actions = actions + [successor_action]
                 new_cost = costs + successor_cost
-                fringe.push((successor_state, new_actions, new_cost), new_cost)
-    return []
-    util.raiseNotDefined()
+                fringe.push((successor_state, new_actions, new_cost), new_cost) # adding it to the queue using the total path cost as its priority
+    return [] # if we searched everything and couldn't find the goal
 
 def nullHeuristic(state, problem=None) -> float:
     """
@@ -190,55 +192,57 @@ def nullHeuristic(state, problem=None) -> float:
 def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic) -> List[Directions]:
     """Search the node that has the lowest combined cost and heuristic first."""
 
-    start = problem.getStartState() # getting the start of the search 
-    fringe = util.PriorityQueue() # initalizing priority queue 
-    visited = set() # initializing a set to store all visited states 
-    is_consistent = True # creating a consistency check 
+    # getting the starting state and set up the priority queue
+    start = problem.getStartState() 
+    fringe = util.PriorityQueue() 
 
-    # storing the state, path, and cost along with the heuristic
+    visited = set() # keeping track of states we already visited so we don't explore them again
+    is_consistent = True # keeping track of whether the heuristic stays consistent during the search
+
+    # starting with the starting state, no actions, and a path cost of 0; the starting priority is just its heuristic since the path cost is 0
     fringe.push((start, [], 0), heuristic(start, problem))
 
-    # looping continuously while fringe is not empty 
+    # keep searching until there is nothing left in the priority queue
     while not fringe.isEmpty():
-        current = fringe.pop() # popping the first one in the priority queue
-        
-        # separating into different variables 
+        # getting the state with the lowest combined cost and heuristic
+        current = fringe.pop()
         state = current[0]
         path = current[1]
         cost = current[2]
 
-        if state in visited: # if the state is already visited then continue on 
+        if state in visited: # if we already visited this state skip it
             continue
         
-        if problem.isGoalState(state): # if the problem reaches the goal state then return the path 
+        # if we reached the goal return the path we took to get here
+        if problem.isGoalState(state): 
             if is_consistent:
                 print("CONSISTENT")
             else:
                 print("INCONSISTENT")
-
             return path
 
-        visited.add(state) # add the state into the visited set 
+        visited.add(state) # marking this state as visited before looking at its successors
 
-        # looping through the successors of the current state
+        # looking through all the possible states we can go to next
         for successor in problem.getSuccessors(state): 
             successor_state = successor[0]
             action = successor[1]
             step_cost = successor[2]
 
+            # getting the heuristic values so we can check consistency
             current_h = heuristic(state, problem)
             successor_h = heuristic(successor_state, problem)
 
-            # checking if the heuristic is consistent 
+            # checking if consistent heuristic; should satisfy h(n) <= cost(n,n') + h(n')
             if current_h > step_cost + successor_h:
                 is_consistent = False
 
-            new_path = path + [action] # updating the new path 
-            new_cost = cost + step_cost # calculating the new cost 
-            priority = new_cost + heuristic(successor_state, problem) # calculating the priority 
-            fringe.push((successor_state, new_path, new_cost), priority) # pushing the successor into the priority queue 
-
-    return [] # if no solution is found 
+            # updating the path and total cost to reach this successor
+            new_path = path + [action] 
+            new_cost = cost + step_cost 
+            priority = new_cost + heuristic(successor_state, problem) # calculating A* using path cost + heuristic as the priority
+            fringe.push((successor_state, new_path, new_cost), priority) # adding the successor to the priority queue
+    return [] # if we searched everything and couldn't find the goal
 
 # Abbreviations
 bfs = breadthFirstSearch

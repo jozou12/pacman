@@ -494,18 +494,23 @@ class AStarFoodSearchAgent(SearchAgent):
 #     "*** YOUR CODE HERE ***"
 #     return 0
 def foodHeuristic(state, problem):
+    "Get Pac-Man's location and food grid from state"
     position, foodGrid = state
+    "Convert foodGrid to list for iterating"
     foodList = foodGrid.asList()
-    
+    "If no food in foodList, it reach to the goal"
     if not foodList:
         return 0
-    
+    "The distance between Pac-Man and furthest food coordinate"
     max_distance = 0
     for food in foodList:
-        distance = mazeDistance(position, food, problem.startingGameState)
-        max_distance = max(max_distance, distance)
+        "position + food coordinate be the key for the dict heuristicInfo"
+        key = (position, food)
+        if key not in problem.heuristicInfo:
+            problem.heuristicInfo[key] = mazeDistance(position, food, problem.startingGameState)
+        max_distance = max(max_distance, problem.heuristicInfo[key])
     
-    return max_distance 
+    return max_distance
 
 # Originally, we used Manhattan distance from Pacman to the farthest food but the number of nodes expanded was still high (>9000)
 # Instead, we decided to find the two remaining food pellets that are farthest apart using Manhattan distance

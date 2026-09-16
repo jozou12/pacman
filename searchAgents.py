@@ -397,54 +397,6 @@ def cornersHeuristic(state: Any, problem: CornersProblem):
 
     return shortest_path(position, remaining)
 
-# def cornersHeuristic(state: Any, problem: CornersProblem):
-#     """
-#     A heuristic for the CornersProblem that you defined.
-
-#       state:   The current search state
-#                (a data structure you chose in your search problem)
-
-#       problem: The CornersProblem instance for this layout.
-
-#     This function should always return a number that is a lower bound on the
-#     shortest path from the state to a goal of the problem; i.e.  it should be
-#     admissible.
-#     """
-#     corners = problem.corners # These are the corner coordinates
-#     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
-
-#     # getting current position and which corners are already visited
-#     current_pos = state[0]
-#     corners_status = list(state[1])
-#     total_distance = 0
-
-#     # keep going until we have accounted for every remaining corner
-#     while True:
-#         shortest_distance = float('inf')
-#         nearest_corner = None
-#         nearest_index = -1
-
-#         for i in range(4): # finding the closest corner that we haven't visited yet
-#             if not corners_status[i]:
-#                 xy2 = corners[i]
-#                 distance = abs(current_pos[0] - xy2[0]) + abs(current_pos[1] - xy2[1]) # using manhattan distance between the current position and corner
-                
-#                 if distance < shortest_distance:
-#                     shortest_distance = distance
-#                     nearest_corner = xy2
-#                     nearest_index = i
-
-#         if nearest_corner is None: # if there are no corners left then we are done 
-#             break
-
-#         # updating the nearest corner as visited and continue from there
-#         corners_status[nearest_index] = True
-#         current_pos = nearest_corner
-#         total_distance += shortest_distance
-        
-#     return total_distance
-
-
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for CornersProblem using A* and your cornersHeuristic"

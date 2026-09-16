@@ -367,54 +367,82 @@ class CornersProblem(search.SearchProblem):
             if self.walls[x][y]: return 999999
         return len(actions)
 
-
-
 def cornersHeuristic(state: Any, problem: CornersProblem):
-    """
-    A heuristic for the CornersProblem that you defined.
+    # getting position and corner visited status from state
+    corners = problem.corners
+    position = state[0]
+    visited = state[1]
 
-      state:   The current search state
-               (a data structure you chose in your search problem)
+    # if any corner not been visited add to remaining
+    remaining = []
+    for i in range(4):
+        if not visited[i]:
+            remaining.append(corners[i])
+    # if all corners have been visited the remaining will be empty; reach to the goal then h(n) = 0
+    if not remaining:
+        return 0
 
-      problem: The CornersProblem instance for this layout.
-
-    This function should always return a number that is a lower bound on the
-    shortest path from the state to a goal of the problem; i.e.  it should be
-    admissible.
-    """
-    corners = problem.corners # These are the corner coordinates
-    walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
-
-    # getting current position and which corners are already visited
-    current_pos = state[0]
-    corners_status = list(state[1])
-    total_distance = 0
-
-    # keep going until we have accounted for every remaining corner
-    while True:
+    # calculating the distance between pacman's location and one of the unvisited corner
+    # calculating the distance between the picked corner and rest corners; getting shortest path 
+    def shortest_path(pos, remaining):
+        if not remaining:
+            return 0
         shortest_distance = float('inf')
-        nearest_corner = None
-        nearest_index = -1
+        for i in range(len(remaining)):
+            corner = remaining[i]
+            rest_corner = remaining[:i] + remaining[i+1:]
+            distance = util.manhattanDistance(pos, corner)
+            shortest_distance = min(shortest_distance, distance + shortest_path(corner, rest_corner))
+        return shortest_distance
 
-        for i in range(4): # finding the closest corner that we haven't visited yet
-            if not corners_status[i]:
-                xy2 = corners[i]
-                distance = abs(current_pos[0] - xy2[0]) + abs(current_pos[1] - xy2[1]) # using manhattan distance between the current position and corner
+    return shortest_path(position, remaining)
+
+# def cornersHeuristic(state: Any, problem: CornersProblem):
+#     """
+#     A heuristic for the CornersProblem that you defined.
+
+#       state:   The current search state
+#                (a data structure you chose in your search problem)
+
+#       problem: The CornersProblem instance for this layout.
+
+#     This function should always return a number that is a lower bound on the
+#     shortest path from the state to a goal of the problem; i.e.  it should be
+#     admissible.
+#     """
+#     corners = problem.corners # These are the corner coordinates
+#     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
+
+#     # getting current position and which corners are already visited
+#     current_pos = state[0]
+#     corners_status = list(state[1])
+#     total_distance = 0
+
+#     # keep going until we have accounted for every remaining corner
+#     while True:
+#         shortest_distance = float('inf')
+#         nearest_corner = None
+#         nearest_index = -1
+
+#         for i in range(4): # finding the closest corner that we haven't visited yet
+#             if not corners_status[i]:
+#                 xy2 = corners[i]
+#                 distance = abs(current_pos[0] - xy2[0]) + abs(current_pos[1] - xy2[1]) # using manhattan distance between the current position and corner
                 
-                if distance < shortest_distance:
-                    shortest_distance = distance
-                    nearest_corner = xy2
-                    nearest_index = i
+#                 if distance < shortest_distance:
+#                     shortest_distance = distance
+#                     nearest_corner = xy2
+#                     nearest_index = i
 
-        if nearest_corner is None: # if there are no corners left then we are done 
-            break
+#         if nearest_corner is None: # if there are no corners left then we are done 
+#             break
 
-        # updating the nearest corner as visited and continue from there
-        corners_status[nearest_index] = True
-        current_pos = nearest_corner
-        total_distance += shortest_distance
+#         # updating the nearest corner as visited and continue from there
+#         corners_status[nearest_index] = True
+#         current_pos = nearest_corner
+#         total_distance += shortest_distance
         
-    return total_distance
+#     return total_distance
 
 
 
